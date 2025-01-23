@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ランキング画面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 20px;
+        }
+
+        #ranking-table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        #ranking-table th,
+        #ranking-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        #ranking-table th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .return-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .return-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>ランキング</h1>
+    <table id="ranking-table">
+        <thead>
+            <tr>
+                <th>順位</th>
+                <th>プレイヤー名</th>
+                <th>スコア</th>
+            </tr>
+        </thead>
+        <tbody id="ranking-body">
+            <!-- ランキングデータがここに挿入されます -->
+        </tbody>
+    </table>
+
+    <button class="return-button" onclick="goBack()">戻る</button>
+
+    <script>
+        // ランキングデータのサンプル
+        const rankingData = [
+            { rank: 1, name: "山田太郎", score: 1500 },
+            { rank: 2, name: "田中花子", score: 1300 },
+            { rank: 3, name: "佐藤次郎", score: 1200 },
+            { rank: 4, name: "鈴木一郎", score: 1100 },
+            { rank: 5, name: "高橋和子", score: 1000 },
+        ];
+
+        // ランキングデータをテーブルに挿入
+        function populateRanking() {
+            const rankingBody = document.getElementById('ranking-body');
+            rankingData.forEach(player => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${player.rank}</td>
+                    <td>${player.name}</td>
+                    <td>${player.score}</td>
+                `;
+                rankingBody.appendChild(row);
+            });
+        }
+
+        // 戻るボタンの動作
+        function goBack() {
+            window.location.href = "index.html"; // 元のページに戻る
+        }
+
+        // ランキングを表示
+        populateRanking();
+    </script>
+
+</body>
+
+</html>

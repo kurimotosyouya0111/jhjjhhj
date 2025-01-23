@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>名前入力フォーム</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #6a5acd;
+            /* 背景色を青紫に設定 */
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: white;
+            /* タイトルの文字色を白に設定 */
+        }
+
+        h2 {
+            font-size: 30px;
+            margin-bottom: 15px;
+            color: white;
+            /* タイトルの文字色を白に設定 */
+        }
+
+        input {
+            font-size: 1.5em;
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            margin-bottom: 10px;
+        }
+
+        #submitButton {
+            font-size: 1.5em;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: white;
+            /* メッセージの文字色を白に設定 */
+        }
+    </style>
+</head>
+
+<body>
+    <h1>名前を入力してください</h1>
+
+    <input type="text" id="nameInput" placeholder="既存の名前を入力" />
+    <button id="submitButton">送信</button>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <h2>新規の方はこちら</h2>
+    <input type="text" id="newNameInput" placeholder="新しい名前を入力" />
+    <button id="submitButton">送信</button>
+
+    <div id="message"></div>
+
+    <script>
+        document.getElementById('submitButton').addEventListener('click', function () {
+            const name = document.getElementById('nameInput').value;
+            const newName = document.getElementById('newNameInput').value;
+
+            if (name) {
+                // 名前が入力されている場合、main.htmlに遷移
+                window.location.href = 'main.html';
+            } else if (newName) {
+                // 新しい名前が入力されている場合の処理
+                document.getElementById('message').innerText = `新しい名前「${newName}」が作成されました！`;
+            } else {
+                document.getElementById('message').innerText = '名前を入力してください。';
+            }
+        });
+    </script>
+</body>
+
+</html>

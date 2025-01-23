@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="pazuru.css">
+    <title>スライディングパズル</title>
+    <style>
+        /* ダークモード用のCSS */
+        body.dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .dark-mode button {
+            background-color: #444;
+            color: #fff;
+        }
+
+        .dark-mode select {
+            background-color: #444;
+            color: #fff;
+        }
+
+        /* クイズのスタイル */
+        .quiz-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            color: white;
+            border-radius: 8px;
+            font-size: 18px;
+            width: 300px;
+        }
+
+        .question {
+            margin-bottom: 15px;
+        }
+
+        .question p {
+            font-size: 18px;
+        }
+
+        .options input {
+            margin-right: 10px;
+        }
+
+        /* タイマーと動きのカウント */
+        #timer,
+        #move-count {
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>スライディングパズル</h1>
+        <button id="theme-toggle">ダークモード</button>
+    </div>
+
+    <label for="level">レベル選択:</label>
+    <select id="level">
+        <option value="3">3x3</option>
+        <option value="4">4x4</option>
+        <option value="5">5x5</option>
+    </select>
+
+    <div class="puzzle-container" id="puzzle-container"></div>
+    <div class="controls">
+        <button id="shuffle-btn">シャッフル</button>
+        <button id="solve-btn">解決</button>
+        <button id="reset-btn">リセット</button>
+    </div>
+    <div id="timer">タイマー: <span id="time">0</span>秒</div>
+    <div id="move-count">動き: <span id="moves">0</span></div>
+    <audio id="move-sound" src="move-sound.mp3" preload="auto"></audio>
+
+    <div class="quiz-container" id="quiz-container">
+        <h2>クイズ</h2>
+        <div id="quiz-questions"></div>
+    </div>
+
+    <script src="pazuru.js"></script>
+    <script>
+        // クイズの問題と答え
+        const quizQuestions = [
+            {
+                question: "札幌市はどの都道府県にありますか？",
+                options: ["A) 北海道", "B) 青森県", "C) 岩手県"],
+                answer: "A) 北海道"
+            },
+            // 他のクイズ問題もここに追加
+        ];
+
+        // ページが読み込まれたらクイズを表示
+        window.onload = function () {
+            displayQuiz(); // クイズを表示
+        };
+
+        // クイズの質問を表示する関数
+        function displayQuiz() {
+            const quizContainer = document.getElementById('quiz-questions');
+            quizQuestions.forEach(q => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+
+                questionDiv.innerHTML = `<p>${q.question}</p>`;
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+                q.options.forEach(option => {
+                    const optionInput = document.createElement('input');
+                    optionInput.type = 'radio';
+                    optionInput.name = q.question;
+                    optionInput.value = option;
+                    optionsDiv.appendChild(optionInput);
+                    optionsDiv.innerHTML += `<label>${option}</label><br>`;
+                });
+                questionDiv.appendChild(optionsDiv);
+
+                quizContainer.appendChild(questionDiv);
+            });
+        }
+
+        // ダークモードの切り替え
+        document.getElementById('theme-toggle').onclick = function () {
+            document.body.classList.toggle('dark-mode');
+        };
+    </script>
+</body>
+
+</html>

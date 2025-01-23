@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>位置情報アプリ</title>
+    <style>
+        #map {
+            height: 50vh;
+            width: 50%;
+            margin: 0 auto;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px 15px;
+        }
+
+        .rinku {
+            font-size: xx-large;
+            text-align: left;
+        }
+
+        #saved-locations {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .location-item {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .location-item:hover {
+            color: darkblue;
+        }
+
+        /* ログインモーダルスタイル */
+        #login-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        #login-modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            text-align: left;
+        }
+
+        #login-modal h2 {
+            margin: 0 0 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>位置情報アプリ</h1>
+
+    <button id="login-button" onclick="showLoginModal()">ログイン</button>
+    <button id="logout-button" onclick="logout()" style="display: none;">ログアウト</button>
+    <button onclick="getLocation()" aria-label="現在地を取得" id="get-location-button" style="display: none;">現在地を取得</button>
+    <button onclick="zoomIn()" aria-label="ズームイン" style="display: none;">ズームイン</button>
+    <button onclick="zoomOut()" aria-label="ズームアウト" style="display: none;">ズームアウト</button>
+    <button onclick="saveLocation()" aria-label="現在地を保存" style="display: none;">現在地を保存</button>
+
+    <p class="rinku">
+        <a href="pazuru.html" aria-label="スクショをファイルに格納">スクショをファイルに格納</a>
+    </p>
+
+    <div id="map"></div>
+    <div id="saved-locations">
+        <h2>保存した位置情報</h2>
+        <ul id="locations-list"></ul>
+    </div>
+
+    <!-- ログインモーダル -->
+    <div id="login-modal">
+        <div id="login-modal-content">
+            <h2>ログイン</h2>
+            <label for="username">ユーザー名:</label>
+            <input type="text" id="username"><br>
+            <label for="password">パスワード:</label>
+            <input type="password" id="password"><br><br>
+            <button onclick="login()">ログイン</button>
+            <button onclick="closeLoginModal()">キャンセル</button>
+            <p id="login-message" style="color: red;"></p>
+        </div>
+    </div>
+
+    <script>
+        let map;
+        let markers = [];
+        let savedLocations = [];
+        let isLoggedIn = false;
+
+        function showLoginModal() {
+            document.getElementById('login-modal').style.display = 'block';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').style.display = 'none';
+        }
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // 簡易的なログイン処理
+            if (username === "user" && password === "password") {
+                isLoggedIn = true;
+                alert("ログインに成功しました！");
+                document.getElementById('login-button').style.display = 'none';
+                document.getElementById('logout-button').style.display = 'inline';
+                document.getElementById('get-location-button').style.display = 'inline';
+                document.getElementById('zoomIn-button').style.display = 'inline';
+                document.getElementById('zoomOut-button').style.display = 'inline';
+                document.getElementById('save-location-button').style.display = 'inline';
+                closeLoginModal();
+                initMap(); // 初期マップを表示
+            } else {
+                document.getElementById('login-message').innerText = "ユーザー名またはパスワードが無効です。";
+            }
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            alert("ログアウトしました。");
+            document.getElementById('login-button').style.display = 'inline';
+            document.getElementById('logout-button').style.display = 'none';
+            document.getElementById('get-location-button').style.display = 'none';
+            document.getElementById('zoomIn-button').style.display = 'none';
+            document.getElementById('zoomOut-button').style.display = 'none';
+            document.getElementById('save-location-button').style.display = 'none';
+            clearMap(); // マーカーをクリア
+        }
+
+        function clearMap() {
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            document.getElementById('locations-list').innerHTML = ''; // 保存した位置情報リストをクリア
+            savedLocations = [];
+        }
+
+        function initMap(lat = 35.6812, lng = 139.7671) { // 初期位置: 東京駅
+            const location = [lat, lng];
+
+            // OpenStreetMapの地図を表示
+            map = L.map('map').setView(location, 15);
+
+            // OpenStreetMapのタイルレイヤーを追加
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            // 現在地のマーカーを追加
+            addMarker(location, '近場');
+        }
+
+        function addMarker(location, message) {
+            const marker = L.marker(location).addTo(map)
+                .bindPopup(message)
+                .openPopup();
+            markers.push(marker);
+        }
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        alert(`現在地: 緯度 ${lat}, 経度 ${lng}`);
+                        initMap(lat, lng);
+                    },
+                    () => {
+                        alert("位置情報の取得に失敗しました。");
+                        initMap(); // 初期位置を表示
+                    }
+                );
+            } else {
+                alert("このブラウザは位置情報をサポートしていません。");
+                initMap(); // 初期位置を表示
+            }
+        }
+
+        function saveLocation() {
+            const currentCenter = map.getCenter();
+            const lat = currentCenter.lat;
+            const lng = currentCenter.lng;
+            const locationName = `位置 ${savedLocations.length + 1}: 緯度 ${lat}, 経度 ${lng}`;
+
+            savedLocations.push({ lat, lng, name: locationName });
+            updateSavedLocationsList();
+            addMarker([lat, lng], locationName);
+        }
+
+        function updateSavedLocationsList() {
+            const locationsList = document.getElementById('locations-list');
+            locationsList.innerHTML = '';
+            savedLocations.forEach((location, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = location.name;
+                listItem.className = 'location-item';
+                listItem.onclick = () => {
+                    map.setView([location.lat, location.lng], 15);
+                };
+                locationsList.appendChild(listItem);
+            });
+        }
+
+        function zoomIn() {
+            map.zoomIn();
+        }
+
+        function zoomOut() {
+            map.zoomOut();
+        }
+
+        // 初期マップを表示
+        initMap();
+    </script>
+
+    <!-- Leaflet.jsライブラリを追加 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+</body>
+
+</html>
