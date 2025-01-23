@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>位置情報パズル</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #quiz-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .quiz-item {
+            margin-bottom: 20px;
+            text-align: left;
+            width: 80%;
+        }
+
+        .quiz-item h3 {
+            margin: 0 0 10px;
+        }
+
+        .quiz-item button {
+            margin: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        #puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 5px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+
+        .puzzle-piece {
+            width: 100px;
+            height: 100px;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+        }
+
+        .puzzle-piece.correct {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+
+        #complete-message {
+            display: none;
+            font-size: 24px;
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>位置情報パズル</h1>
+
+    <div id="quiz-container"></div>
+
+    <div id="puzzle-container">
+        <!-- Puzzle grid will be dynamically generated -->
+    </div>
+
+    <div id="complete-message">パズル完成おめでとうございます！</div>
+
+    <script>
+        // クイズデータ
+        const quizData = [
+            {
+                question: "日本の首都はどこですか？",
+                options: ["東京", "大阪", "京都"],
+                answer: "東京"
+            },
+            {
+                question: "富士山がある都道府県はどこですか？",
+                options: ["静岡県", "山梨県", "長野県"],
+                answer: "静岡県"
+            },
+            {
+                question: "札幌市がある都道府県はどこですか？",
+                options: ["北海道", "青森県", "岩手県"],
+                answer: "北海道"
+            },
+            {
+                question: "日本で一番人口が多い都道府県はどこですか？",
+                options: ["東京都", "神奈川県", "大阪府"],
+                answer: "東京都"
+            },
+            {
+                question: "琵琶湖がある都道府県はどこですか？",
+                options: ["滋賀県", "京都府", "奈良県"],
+                answer: "滋賀県"
+            },
+            {
+                question: "原爆ドームがある都市はどこですか？",
+                options: ["広島市", "長崎市", "福岡市"],
+                answer: "広島市"
+            },
+            {
+                question: "なごやめしで有名な都市はどこですか？",
+                options: ["名古屋市", "京都市", "大阪市"],
+                answer: "名古屋市"
+            },
+            {
+                question: "日本で一番南に位置する都道府県はどこですか？",
+                options: ["沖縄県", "鹿児島県", "熊本県"],
+                answer: "沖縄県"
+            },
+            {
+                question: "金沢市がある都道府県はどこですか？",
+                options: ["石川県", "富山県", "福井県"],
+                answer: "石川県"
+            }
+        ];
+
+        // クイズの表示
+        const quizContainer = document.getElementById('quiz-container');
+        let correctCount = 0;
+
+        function createQuiz() {
+            quizData.forEach((quiz, index) => {
+                const quizItem = document.createElement('div');
+                quizItem.className = 'quiz-item';
+
+                const question = document.createElement('h3');
+                question.textContent = `問題 ${index + 1}: ${quiz.question}`;
+                quizItem.appendChild(question);
+
+                quiz.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.onclick = () => checkAnswer(index, option, button);
+                    quizItem.appendChild(button);
+                });
+
+                quizContainer.appendChild(quizItem);
+            });
+        }
+
+        function checkAnswer(index, selectedOption, button) {
+            const quiz = quizData[index];
+
+            if (selectedOption === quiz.answer) {
+                button.style.backgroundColor = 'green';
+                button.style.color = 'white';
+                button.disabled = true;
+                revealPuzzlePiece(index);
+                correctCount++;
+                checkCompletion();
+            } else {
+                button.style.backgroundColor = 'red';
+                button.style.color = 'white';
+            }
+        }
+
+        // パズルの初期化
+        const puzzleContainer = document.getElementById('puzzle-container');
+
+        function createPuzzle() {
+            for (let i = 0; i < quizData.length; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'puzzle-piece hidden';
+                piece.textContent = i + 1;
+                puzzleContainer.appendChild(piece);
+            }
+        }
+
+        function revealPuzzlePiece(index) {
+            const pieces = document.querySelectorAll('.puzzle-piece');
+            pieces[index].classList.remove('hidden');
+            pieces[index].classList.add('correct');
+        }
+
+        function checkCompletion() {
+            if (correctCount === quizData.length) {
+                document.getElementById('complete-message').style.display = 'block';
+            }
+        }
+
+        // 初期化
+        createQuiz();
+        createPuzzle();
+    </script>
+</body>
+
+</html>
